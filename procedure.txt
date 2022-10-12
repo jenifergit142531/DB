@@ -1,0 +1,114 @@
+Stored Procedure :
+
+What is a procedure:
+
+A stored procedure is a set of SQL statements, which has been created and stored in the database as an object. 
+*SQL Server stored procedure is a batch of statements grouped as a logical unit and stored in the database.
+Stored procedure will accept the input and output parameters, so that a single procedure can be used over the network by several users, using different input. 
+Stored procedure will reduce the network traffic and increase the performance.
+
+Benefits of using a stored procedure
+
+- It can be easily modified:
+ We can easily modify the code inside the stored procedure without the need to restart or deploying the application.
+ For example, If the T-SQL queries are written in the application and if we need to change the logic, we must change the code in the application and re-deploy it. 
+SQL Server Stored procedures eliminate such challenges by storing the code in the database. 
+so, when we want to change the logic inside the procedure we can just do it by simple ALTER PROCEDURE statement.
+
+Reduced network traffic: 
+When we use stored procedures instead of writing T-SQL queries at the application level, 
+only the procedure name is passed over the network instead of the whole T-SQL code.
+
+Reusable: Stored procedures can be executed by multiple users or multiple client applications without the need of writing the code again.
+
+Security: Stored procedures reduce the threat by eliminating direct access to the tables. 
+we can also encrypt the stored procedures while creating them so that source code inside the stored procedure is not visible. 
+Use third-party tools like ApexSQL Decrypt to decrypt the encrypted stored procedures.
+
+Performance: The SQL Server stored procedure when executed for the first time creates a plan and
+ stores it in the buffer pool so that the plan can be reused when it executes next time.
+
+create table Product  
+(  
+      ProductId int primary key,  
+      ProductName varchar(20) unique,  
+      ProductQty int,  
+      ProductPrice float  
+)  
+
+insert product values(1,'Printer',10,4500)  
+insert product values(2,'Scanner',15,3500)  
+insert product values(3,'Mouse',45,500)  
+select * from product
+
+
+create procedure prcInsert   
+@id int,  
+@name varchar(40),  
+@qty int,  
+@price float  
+as  
+begin  
+ declare @cnt int  
+ declare @p float  
+ select @cnt=COUNT(ProductId)from Product where ProductName=@name  
+ if(@cnt>0)  
+ begin  
+  update Product set ProductQty=ProductQty+@qty where ProductName=@name  
+  select @p=ProductPrice from Product where ProductName=@name  
+  if(@p<@price)  
+  begin  
+   update Product set ProductPrice=@price where ProductName=@name  
+  end  
+ end  
+ else  
+ begin  
+  insert Product values(@id,@name,@qty,@price)  
+ end  
+end   
+
+exec prcInsert @id=2,@name='scanner',@qty=3,@price=1600
+
+
+exec prcInsert @id=4,@name='Iphone',@qty=10,@price=25000
+
+
+Case Statements :
+
+Case statement acts like an If-Else statement in stored procedure. 
+It will modify the name of the data, which is not  actual data in the table.
+
+Description
+
+Case statement is mostly used in real time scenarios. Sometimes it is based on Id of a table's column value.
+You can mention the list of names in the dropdown binding list using case statement in T-SQL.
+
+Create procedure Sp_CaseStatement  
+As  
+Begin  
+set NoCount ON;  
+select  case Product.ProductName when 'Printer' Then 'Printer(400)'  
+when 'Scanner' Then 'Scanner(100)'  
+when 'Mouse' Then 'Mouse(200)'  
+when 'Iphone' Then 'Iphone(300)'   
+else 'UnKnown' end as 'Your Contribution Counts'  
+from Product 
+end 
+
+
+exec Sp_CaseStatement
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
